@@ -1,3 +1,4 @@
+
 //
 //  MapViewController.swift
 //  Virtual Tourist
@@ -8,18 +9,50 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var bottomToolbar: UIToolbar!
+    @IBOutlet weak var editBtn: UIBarButtonItem!
     
-    var userAnnotations = [MKPointAnnotation]()
+    // for animating view when edit is pressed
+    @IBOutlet weak var mapViewBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var bottomToolbarBottomConstraint: NSLayoutConstraint!
+    
+    var editingMap = false
+    var editButtonAction = UIBarButtonItem()
+    
+    var userAnnotations: [NSManagedObject] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
+        editButtonAction = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editBtnPressed))
+        navigationItem.rightBarButtonItem = editButtonAction
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
+        
+        do {
+            userAnnotations = try managedContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+        print(userAnnotations.count)
+        loadSavedAnnotations()
+    }
+
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
     
         let reuseId = "pin"
@@ -54,10 +87,62 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let newAnnotation = MKPointAnnotation()
             newAnnotation.coordinate = coords
             mapView.addAnnotation(newAnnotation)
-            // add to annotaions array for persistence
-            userAnnotations.append(newAnnotation)
-            //print(userAnnotations.count)
+            savePin(coords: coords)
         }
     }
-
+    
+    func loadSavedAnnotations() {
+        //print("Loaded user annotations count: \(userAnnotations.count)")
+        for annotationObject in userAnnotations {
+            let annotation = MKPointAnnotation()
+            annotation.coordinate.latitude = annotationObject.value(forKey: "latitude") as! CLLocationDegrees
+            annotation.coordinate.longitude = annotationObject.value(forKey: "longitude") as! CLLocationDegrees
+            mapView.addAnnotation(annotation)
+            //print("Loaded annotation: \(annotation.coordinate)")
+        }
+        //print("Added annotaions count: \(mapView.annotations.count)")
+    }
+   
+    // Save pin to core data
+    func savePin(coords: CLLocationCoordinate2D) {
+        
+        guard let appDelegate =  UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let entity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
+        let pin = NSManagedObject(entity: entity, insertInto: managedContext)
+        pin.setValue(coords.latitude, forKey: "latitude")
+        pin.setValue(coords.longitude, forKey: "longitude")
+        
+        do {
+            try managedContext.save()
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+    }
+    
+    func editBtnPressed() {
+        
+        if !editingMap {
+            editingMap = true
+            navigationItem.rightBarButtonItem?.title = "Done"
+            navigationItem.rightBarButtonItem?.style = .done
+            mapViewBottomConstraint.constant += bottomToolbar.frame.height
+            bottomToolbarBottomConstraint.constant += bottomToolbar.frame.height
+            UIView.animate(withDuration: 0.4 , animations: {
+                self.view.layoutIfNeeded()
+            })
+        } else {
+            editingMap = false
+            navigationItem.rightBarButtonItem?.title = "Edit"
+            navigationItem.rightBarButtonItem?.style = .plain
+            mapViewBottomConstraint.constant -= bottomToolbar.frame.height
+            bottomToolbarBottomConstraint.constant -= bottomToolbar.frame.height
+            UIView.animate(withDuration: 0.4 , animations: {
+                self.view.layoutIfNeeded()
+            })
+        }
+    }
 }

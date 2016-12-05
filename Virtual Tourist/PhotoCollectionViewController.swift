@@ -10,10 +10,14 @@ import UIKit
 
 class PhotoCollectionViewController: UIViewController {
 
+    let Client = FlickrClient()
+    // need pin info so we can get lat long and save placeId 
+    //var pin =
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        Client.getLocationId(lat: 11.1111, lon: 22.2222)
     }
 
     override func didReceiveMemoryWarning() {
