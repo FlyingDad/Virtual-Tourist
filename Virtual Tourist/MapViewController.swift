@@ -21,6 +21,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var mapViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomToolbarBottomConstraint: NSLayoutConstraint!
     
+    var managedContext: NSManagedObjectContext!
+    
     var editingMap = false
     var editButtonAction = UIBarButtonItem()
     
@@ -35,22 +37,22 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
-        
-        let managedContext = appDelegate.persistentContainer.viewContext
-        
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
-        
-        do {
-            userAnnotations = try managedContext.fetch(fetchRequest)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
-        print(userAnnotations.count)
-        loadSavedAnnotations()
+//        
+//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+//            return
+//        }
+//        
+//        let managedContext = appDelegate.persistentContainer.viewContext
+//        
+//        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
+//        
+//        do {
+//            userAnnotations = try managedContext.fetch(fetchRequest)
+//        } catch let error as NSError {
+//            print("Could not fetch. \(error), \(error.userInfo)")
+//        }
+//        print(userAnnotations.count)
+//        loadSavedAnnotations()
     }
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -91,36 +93,40 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    func loadSavedAnnotations() {
-        //print("Loaded user annotations count: \(userAnnotations.count)")
-        for annotationObject in userAnnotations {
-            let annotation = MKPointAnnotation()
-            annotation.coordinate.latitude = annotationObject.value(forKey: "latitude") as! CLLocationDegrees
-            annotation.coordinate.longitude = annotationObject.value(forKey: "longitude") as! CLLocationDegrees
-            mapView.addAnnotation(annotation)
-            //print("Loaded annotation: \(annotation.coordinate)")
-        }
-        //print("Added annotaions count: \(mapView.annotations.count)")
-    }
+//    func loadSavedAnnotations() {
+//        //print("Loaded user annotations count: \(userAnnotations.count)")
+//        for annotationObject in userAnnotations {
+//            let annotation = MKPointAnnotation()
+//            annotation.coordinate.latitude = annotationObject.value(forKey: "latitude") as! CLLocationDegrees
+//            annotation.coordinate.longitude = annotationObject.value(forKey: "longitude") as! CLLocationDegrees
+//            mapView.addAnnotation(annotation)
+//            //print("Loaded annotation: \(annotation.coordinate)")
+//        }
+//        //print("Added annotaions count: \(mapView.annotations.count)")
+//    }
    
     // Save pin to core data
     func savePin(coords: CLLocationCoordinate2D) {
         
-        guard let appDelegate =  UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
+        let fetch = NSFetchRequest<Pin>(entityName: "Pin")
+        let count = try! managedContext.count(for: fetch)
+        print(count)
         
-        let managedContext = appDelegate.persistentContainer.viewContext
-        let entity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
-        let pin = NSManagedObject(entity: entity, insertInto: managedContext)
-        pin.setValue(coords.latitude, forKey: "latitude")
-        pin.setValue(coords.longitude, forKey: "longitude")
-        
-        do {
-            try managedContext.save()
-        } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
-        }
+//        guard let appDelegate =  UIApplication.shared.delegate as? AppDelegate else {
+//            return
+//        }
+//        
+//        let managedContext = appDelegate.persistentContainer.viewContext
+//        let entity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
+//        let pin = NSManagedObject(entity: entity, insertInto: managedContext)
+//        pin.setValue(coords.latitude, forKey: "latitude")
+//        pin.setValue(coords.longitude, forKey: "longitude")
+//        
+//        do {
+//            try managedContext.save()
+//        } catch let error as NSError {
+//            print("Could not save. \(error), \(error.userInfo)")
+//        }
     }
     
     func editBtnPressed() {

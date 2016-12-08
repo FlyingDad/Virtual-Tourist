@@ -16,7 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        let navvc = window?.rootViewController as? UINavigationController
+        guard let mapvc = navvc?.viewControllers.first as? MapViewController else {
+            print("Error getting mapvc in appdelegate")
+            return true
+        }
+        mapvc.managedContext = persistentContainer.viewContext
         return true
     }
 

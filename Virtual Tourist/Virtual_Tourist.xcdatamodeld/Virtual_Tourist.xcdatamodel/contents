@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11542" systemVersion="16B2555" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Pin" representedClassName="Pin" syncable="YES" codeGenerationType="class">
+    <entity name="Pin" representedClassName="Pin" syncable="YES">
         <attribute name="latitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="longitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="flickrLocationId" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="PinFlickrLocationId" inverseName="pin" inverseEntity="PinFlickrLocationId" syncable="YES"/>
-    </entity>
-    <entity name="PinFlickrLocationId" representedClassName="PinFlickrLocationId" syncable="YES" codeGenerationType="class">
-        <attribute name="locationId" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="pin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pin" inverseName="flickrLocationId" inverseEntity="Pin" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Pin" positionX="-63" positionY="-18" width="128" height="90"/>
-        <element name="PinFlickrLocationId" positionX="-63" positionY="0" width="128" height="75"/>
+        <element name="Pin" positionX="-63" positionY="-18" width="128" height="75"/>
     </elements>
 </model>
