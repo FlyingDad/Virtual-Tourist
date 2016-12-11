@@ -7,33 +7,47 @@
 //
 
 import UIKit
+import MapKit
 
-class PhotoCollectionViewController: UIViewController {
+class PhotoCollectionViewController: UIViewController, MKMapViewDelegate {
 
+    @IBOutlet weak var mapView: MKMapView!
+    
     let Client = FlickrClient()
     // need pin info so we can get lat long and save placeId 
-    //var pin =
+    var pinView = MKAnnotationView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        Client.getLocationId(lat: 11.1111, lon: 22.2222)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        mapView.delegate = self
+        //Client.getLocationId(lat: 11.1111, lon: 22.2222)
+        setupMapView(view: pinView)
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    // Purple pin
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        var pinView: MKPinAnnotationView
+        pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
+        pinView.animatesDrop = true
+        pinView.pinTintColor = UIColor.purple
+        pinView.canShowCallout = false
+        
+        return pinView
     }
-    */
 
+    func setupMapView(view: MKAnnotationView) {
+        mapView.isScrollEnabled = false
+        mapView.addAnnotation(view.annotation!)
+        let span = MKCoordinateSpan(latitudeDelta: 0.04225, longitudeDelta: 0.04225)
+        let region = MKCoordinateRegion(center: (view.annotation?.coordinate)!, span: span)
+        mapView.setRegion(region, animated: true)
+    }
+    
+    @IBAction func doneBtnPressed(_ sender: Any) {
+        if let navController = self.navigationController {
+            navController.popViewController(animated: true)
+        }
+    }
+    
 }

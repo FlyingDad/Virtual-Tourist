@@ -14,15 +14,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        let navvc = window?.rootViewController as? UINavigationController
-        guard let mapvc = navvc?.viewControllers.first as? MapViewController else {
+        guard let navController = window?.rootViewController as? UINavigationController,
+            let mapViewController = navController.topViewController as? MapViewController else {
             print("Error getting mapvc in appdelegate")
             return true
         }
-        mapvc.managedContext = persistentContainer.viewContext
+        mapViewController.managedContext = persistentContainer.viewContext
         return true
     }
 

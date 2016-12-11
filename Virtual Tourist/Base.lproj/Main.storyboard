@@ -69,12 +69,12 @@
                     </connections>
                 </pongPressGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1079.2" y="138.98050974512745"/>
+            <point key="canvasLocation" x="1252" y="139"/>
         </scene>
         <!--Title-->
         <scene sceneID="QRP-Li-G1q">
             <objects>
-                <viewController id="Cy3-mH-tkT" customClass="PhotoCollectionViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="PhotoCollectionViewController" id="Cy3-mH-tkT" customClass="PhotoCollectionViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="WWL-Kd-a4G"/>
                         <viewControllerLayoutGuide type="bottom" id="7Py-xV-yq5"/>
@@ -99,7 +99,7 @@
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="rAD-kQ-GhR">
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photo" id="rAD-kQ-GhR">
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -122,17 +122,24 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="TQl-Ih-AAw">
-                        <barButtonItem key="leftBarButtonItem" systemItem="done" id="o8p-w9-k8b"/>
+                        <barButtonItem key="leftBarButtonItem" systemItem="done" id="o8p-w9-k8b">
+                            <connections>
+                                <action selector="doneBtnPressed:" destination="Cy3-mH-tkT" id="30A-p8-myf"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="mapView" destination="G1N-Ir-sfT" id="E7S-Rw-kG4"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Oj9-Y6-q87" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2836" y="138.98050974512745"/>
+            <point key="canvasLocation" x="2012" y="139"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--MapViewNavigationController-->
         <scene sceneID="vQT-Yu-JzI">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="7O1-PS-3cS" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="MapViewNavigationController" title="MapViewNavigationController" automaticallyAdjustsScrollViewInsets="NO" id="7O1-PS-3cS" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ghC-2u-m1N">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -145,25 +152,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dfy-Iv-S2c" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="140" y="138.98050974512745"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="uGe-Nf-veP">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="fKx-bd-QZY" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="v6h-nb-r6p">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="Cy3-mH-tkT" kind="relationship" relationship="rootViewController" id="Xy2-db-fzX"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="aYO-7t-BOD" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1896.8" y="138.98050974512745"/>
+            <point key="canvasLocation" x="478" y="139"/>
         </scene>
     </scenes>
 </document>

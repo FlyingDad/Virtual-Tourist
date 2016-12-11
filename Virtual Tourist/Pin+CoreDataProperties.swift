@@ -18,5 +18,6 @@ extension Pin {
 
     @NSManaged public var latitude: Double
     @NSManaged public var longitude: Double
+    @NSManaged public var locationId: String?
 
 }

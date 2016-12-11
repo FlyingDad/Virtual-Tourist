@@ -26,7 +26,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     var editingMap = false
     var editButtonAction = UIBarButtonItem()
     
-    var userAnnotations: [NSManagedObject] = []
+    //var userAnnotations: [NSManagedObject] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,22 +37,15 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        
-//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-//            return
-//        }
-//        
-//        let managedContext = appDelegate.persistentContainer.viewContext
-//        
-//        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pin")
-//        
-//        do {
-//            userAnnotations = try managedContext.fetch(fetchRequest)
-//        } catch let error as NSError {
-//            print("Could not fetch. \(error), \(error.userInfo)")
-//        }
-//        print(userAnnotations.count)
-//        loadSavedAnnotations()
+        
+        // Load saved pins
+        let pinFetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
+        do {
+            let results = try managedContext.fetch(pinFetchRequest)
+            loadSavedPins(pins: results)
+        } catch let error as NSError{
+            print("Cound not fetch \(error), \(error.userInfo)")
+        }
     }
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -75,8 +68,55 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
       
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-       print("Selected pin")
-       // goto collectionview from here
+        
+        if editingMap {
+            deletePin(pin: view)
+        } else {
+            // Goto PhotoCollectionViewController
+            guard let photoViewController = UIStoryboard(name:"Main", bundle:nil).instantiateViewController(withIdentifier: "PhotoCollectionViewController") as? PhotoCollectionViewController else {
+                print("Could not instantiate PhotoCollectionViewController")
+                return
+            }
+            photoViewController.pinView = view
+            self.navigationController?.pushViewController(photoViewController, animated:true)
+        }
+
+    }
+    
+    func deletePin(pin: MKAnnotationView) {
+        
+        guard let lat = pin.annotation?.coordinate.latitude, let lon = pin.annotation?.coordinate.longitude else {
+            print("Error getting lat/lon from pin")
+            return
+        }
+        
+        // search for match
+        // Core data rounds the location so we will search between two values using a predicate
+        let precision = 0.000001
+        let pinFetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
+        pinFetchRequest.predicate = NSPredicate(format: "(%K BETWEEN {\(lat - precision), \(lat + precision) }) AND (%K BETWEEN {\(lon - precision), \(lon + precision) })", #keyPath(Pin.latitude), #keyPath(Pin.longitude))
+        
+        do {
+            let results = try managedContext.fetch(pinFetchRequest)
+            print(results.count)
+            print("Searching for \(lat)")
+            // delete the first result (in case there was more than one match)
+            
+            if results.count > 0 {
+                managedContext.delete(results.first!)
+                do {
+                    try managedContext.save()
+                    // Also delete pin from mapview
+                    mapView.removeAnnotation(pin.annotation!)
+                } catch let error as NSError {
+                    print("Saving error: \(error), description: \(error.userInfo)")
+                }
+            }
+            
+        } catch let error as NSError{
+            print("Cound not fetch \(error), \(error.userInfo)")
+            return
+        }
     }
     
     @IBAction func addPin(_ sender: UILongPressGestureRecognizer) {
@@ -93,40 +133,33 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-//    func loadSavedAnnotations() {
-//        //print("Loaded user annotations count: \(userAnnotations.count)")
-//        for annotationObject in userAnnotations {
-//            let annotation = MKPointAnnotation()
-//            annotation.coordinate.latitude = annotationObject.value(forKey: "latitude") as! CLLocationDegrees
-//            annotation.coordinate.longitude = annotationObject.value(forKey: "longitude") as! CLLocationDegrees
-//            mapView.addAnnotation(annotation)
-//            //print("Loaded annotation: \(annotation.coordinate)")
-//        }
-//        //print("Added annotaions count: \(mapView.annotations.count)")
-//    }
+    // Add saved pins to map
+    func loadSavedPins(pins: [Pin]) {
+        //print(pins)
+        for pin in pins {
+            let annotation = MKPointAnnotation()
+            annotation.coordinate.latitude = pin.latitude
+            annotation.coordinate.longitude = pin.longitude
+            mapView.addAnnotation(annotation)
+        }
+    }
    
     // Save pin to core data
     func savePin(coords: CLLocationCoordinate2D) {
         
-        let fetch = NSFetchRequest<Pin>(entityName: "Pin")
-        let count = try! managedContext.count(for: fetch)
-        print(count)
+        let pinEntity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
+        let pin = Pin(entity: pinEntity, insertInto: managedContext)
+        pin.latitude = coords.latitude
+        pin.longitude = coords.longitude
         
-//        guard let appDelegate =  UIApplication.shared.delegate as? AppDelegate else {
-//            return
-//        }
-//        
-//        let managedContext = appDelegate.persistentContainer.viewContext
-//        let entity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
-//        let pin = NSManagedObject(entity: entity, insertInto: managedContext)
-//        pin.setValue(coords.latitude, forKey: "latitude")
-//        pin.setValue(coords.longitude, forKey: "longitude")
-//        
-//        do {
-//            try managedContext.save()
-//        } catch let error as NSError {
-//            print("Could not save. \(error), \(error.userInfo)")
-//        }
+        //let fetch = NSFetchRequest<Pin>(entityName: "Pin")
+        //let count = try! managedContext.count(for: fetch)
+
+        do {
+            try managedContext.save()
+        } catch let error as NSError {
+            print("Could not save new pin. \(error), \(error.userInfo)")
+        }
     }
     
     func editBtnPressed() {
