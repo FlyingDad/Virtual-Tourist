@@ -12,7 +12,9 @@ import Foundation
 class FlickrClient {
     
     
-    func getLocationId(lat: Double, lon: Double) {
+    func getLocationId(lat: Double, lon: Double, completionHandler: @escaping (_ success: Bool, _ data: String, _ error: String) -> Void) {
+        
+        var success = false
         
         let methodParameters = [
             FlickrConstants.FlickrParameterKeys.Method: FlickrConstants.FlickrParameterValues.LatLonMethod,
@@ -34,6 +36,7 @@ class FlickrClient {
             func displayError(error: String) {
                 print(error)
                 print("URL at time of error: \(url)")
+                completionHandler(false, "", "Error getting location ID")
             }
             
             /* GUARD: Was there an error? */
@@ -84,10 +87,11 @@ class FlickrClient {
                 return
             }
             //print(placeId)
-            //Mark: save placeId
+            completionHandler(true, placeId, "")
 
         }
         task.resume()
+        
     }
     
     private func escapedParameters(parameters: [String: Any]) -> String {

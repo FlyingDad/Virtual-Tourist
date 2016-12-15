@@ -21,6 +21,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var mapViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var bottomToolbarBottomConstraint: NSLayoutConstraint!
     
+    let client = FlickrClient()
+    
     var managedContext: NSManagedObjectContext!
     
     var editingMap = false
@@ -77,7 +79,27 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 print("Could not instantiate PhotoCollectionViewController")
                 return
             }
+            
+            // view for mapview in next controller
             photoViewController.pinView = view
+            
+            // search for pin to send to next view controller
+            // Core data rounds the location so we will search between two values using a predicate
+            guard let lat = view.annotation?.coordinate.latitude, let lon = view.annotation?.coordinate.longitude else {
+                print("Error getting lat/lon from pin")
+                return
+            }
+            let precision = 0.000001
+            let pinFetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
+            pinFetchRequest.predicate = NSPredicate(format: "(%K BETWEEN {\(lat - precision), \(lat + precision) }) AND (%K BETWEEN {\(lon - precision), \(lon + precision) })", #keyPath(Pin.latitude), #keyPath(Pin.longitude))
+            
+            do {
+                let results = try managedContext.fetch(pinFetchRequest)
+                photoViewController.pin = results.first!
+            } catch let error as NSError{
+                    print("Cound not fetch \(error), \(error.userInfo)")
+                    return
+            }
             self.navigationController?.pushViewController(photoViewController, animated:true)
         }
 
@@ -100,7 +122,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let results = try managedContext.fetch(pinFetchRequest)
             print(results.count)
             print("Searching for \(lat)")
-            // delete the first result (in case there was more than one match)
+            // delete only the first result (in case there was more than one match)
             
             if results.count > 0 {
                 managedContext.delete(results.first!)
@@ -129,7 +151,16 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let newAnnotation = MKPointAnnotation()
             newAnnotation.coordinate = coords
             mapView.addAnnotation(newAnnotation)
-            savePin(coords: coords)
+            
+            // Get Flickr location ID then save pin to core data
+            client.getLocationId(lat: newAnnotation.coordinate.latitude, lon: newAnnotation.coordinate.longitude, completionHandler: {(success, data, error) in
+                
+                if !success {
+                    print("Error getting Flickr locationID. Error: \(error)")
+                    return
+                }
+                self.savePin(coords: coords, locationId: data)
+            })
         }
     }
     
@@ -145,15 +176,13 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
    
     // Save pin to core data
-    func savePin(coords: CLLocationCoordinate2D) {
+    func savePin(coords: CLLocationCoordinate2D, locationId: String) {
         
         let pinEntity = NSEntityDescription.entity(forEntityName: "Pin", in: managedContext)!
         let pin = Pin(entity: pinEntity, insertInto: managedContext)
         pin.latitude = coords.latitude
         pin.longitude = coords.longitude
-        
-        //let fetch = NSFetchRequest<Pin>(entityName: "Pin")
-        //let count = try! managedContext.count(for: fetch)
+        pin.locationId = locationId
 
         do {
             try managedContext.save()
@@ -161,6 +190,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             print("Could not save new pin. \(error), \(error.userInfo)")
         }
     }
+
     
     func editBtnPressed() {
         

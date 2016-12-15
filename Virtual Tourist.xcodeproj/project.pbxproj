@@ -11,6 +11,7 @@
 		4C1997181DF9EA78002EDEB5 /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1997161DF9EA78002EDEB5 /* Pin+CoreDataProperties.swift */; };
 		4C1FCA051DEF4601004140E3 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1FCA041DEF4601004140E3 /* MapViewController.swift */; };
 		4C45DC131DEB6C4600FA092F /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 4C45DC121DEB6C4600FA092F /* README.md */; };
+		4C5991F91E01EFA700CEA52A /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C5991F81E01EFA700CEA52A /* PhotoCollectionViewCell.swift */; };
 		4C636F7B1DEF6D7B001300C5 /* PhotoCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C636F7A1DEF6D7B001300C5 /* PhotoCollectionViewController.swift */; };
 		4CA541671DF49B3F003FF23B /* FlickrConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA541661DF49B3F003FF23B /* FlickrConstants.swift */; };
 		4CDF60981DEB66DF00F58166 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDF60971DEB66DF00F58166 /* AppDelegate.swift */; };
@@ -22,10 +23,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4C1997151DF9EA78002EDEB5 /* Pin+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Pin+CoreDataClass.swift"; path = "Virtual Tourist/Pin+CoreDataClass.swift"; sourceTree = "<group>"; };
-		4C1997161DF9EA78002EDEB5 /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Pin+CoreDataProperties.swift"; path = "Virtual Tourist/Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4C1997151DF9EA78002EDEB5 /* Pin+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4C1997161DF9EA78002EDEB5 /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		4C1FCA041DEF4601004140E3 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		4C45DC121DEB6C4600FA092F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		4C5991F81E01EFA700CEA52A /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
 		4C636F7A1DEF6D7B001300C5 /* PhotoCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewController.swift; sourceTree = "<group>"; };
 		4CA541661DF49B3F003FF23B /* FlickrConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConstants.swift; sourceTree = "<group>"; };
 		4CDF60941DEB66DF00F58166 /* Virtual Tourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Virtual Tourist.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -58,9 +60,30 @@
 			name = Controller;
 			sourceTree = "<group>";
 		};
+		4C5991F71E01EF6100CEA52A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4C5991F81E01EFA700CEA52A /* PhotoCollectionViewCell.swift */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		4C5991FA1E01EFBD00CEA52A /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				4CDF609B1DEB66DF00F58166 /* Main.storyboard */,
+				4CDF60A31DEB66DF00F58166 /* LaunchScreen.storyboard */,
+				4CDF60A11DEB66DF00F58166 /* Assets.xcassets */,
+			);
+			name = Assets;
+			sourceTree = "<group>";
+		};
 		4CA541641DF49ACE003FF23B /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4C1997151DF9EA78002EDEB5 /* Pin+CoreDataClass.swift */,
+				4C1997161DF9EA78002EDEB5 /* Pin+CoreDataProperties.swift */,
+				4CDF609E1DEB66DF00F58166 /* Virtual_Tourist.xcdatamodeld */,
 				4CA541651DF49B13003FF23B /* Client */,
 			);
 			name = Model;
@@ -78,8 +101,6 @@
 		4CDF608B1DEB66DF00F58166 = {
 			isa = PBXGroup;
 			children = (
-				4C1997151DF9EA78002EDEB5 /* Pin+CoreDataClass.swift */,
-				4C1997161DF9EA78002EDEB5 /* Pin+CoreDataProperties.swift */,
 				4C45DC121DEB6C4600FA092F /* README.md */,
 				4CDF60961DEB66DF00F58166 /* Virtual Tourist */,
 				4CDF60951DEB66DF00F58166 /* Products */,
@@ -97,14 +118,12 @@
 		4CDF60961DEB66DF00F58166 /* Virtual Tourist */ = {
 			isa = PBXGroup;
 			children = (
+				4C5991FA1E01EFBD00CEA52A /* Assets */,
 				4CA541641DF49ACE003FF23B /* Model */,
+				4C5991F71E01EF6100CEA52A /* View */,
 				4C1FCA061DEF4609004140E3 /* Controller */,
 				4CDF60971DEB66DF00F58166 /* AppDelegate.swift */,
-				4CDF609B1DEB66DF00F58166 /* Main.storyboard */,
-				4CDF60A11DEB66DF00F58166 /* Assets.xcassets */,
-				4CDF60A31DEB66DF00F58166 /* LaunchScreen.storyboard */,
 				4CDF60A61DEB66DF00F58166 /* Info.plist */,
-				4CDF609E1DEB66DF00F58166 /* Virtual_Tourist.xcdatamodeld */,
 			);
 			path = "Virtual Tourist";
 			sourceTree = "<group>";
@@ -136,7 +155,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0810;
-				LastUpgradeCheck = 0810;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "MGK Technology Solutions, LLC";
 				TargetAttributes = {
 					4CDF60931DEB66DF00F58166 = {
@@ -183,6 +202,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C636F7B1DEF6D7B001300C5 /* PhotoCollectionViewController.swift in Sources */,
+				4C5991F91E01EFA700CEA52A /* PhotoCollectionViewCell.swift in Sources */,
 				4C1997181DF9EA78002EDEB5 /* Pin+CoreDataProperties.swift in Sources */,
 				4CDF60A01DEB66DF00F58166 /* Virtual_Tourist.xcdatamodeld in Sources */,
 				4CFF15D11DF5BFED00845AD3 /* FlickrClient.swift in Sources */,
@@ -234,6 +254,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -283,6 +304,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

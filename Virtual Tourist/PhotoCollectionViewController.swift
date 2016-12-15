@@ -8,32 +8,52 @@
 
 import UIKit
 import MapKit
+import CoreData
 
-class PhotoCollectionViewController: UIViewController, MKMapViewDelegate {
-
+class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
+    
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var collectionView: UICollectionView!
     
     let Client = FlickrClient()
-    // need pin info so we can get lat long and save placeId 
+    var managedContext: NSManagedObjectContext!
     var pinView = MKAnnotationView()
+    var pin: Pin!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
-        //Client.getLocationId(lat: 11.1111, lon: 22.2222)
         setupMapView(view: pinView)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        print("Finally made it: \(pin.locationId)")
     }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 6
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCollectionViewCell
+        return cell
+    }
+    
     
     // Purple pin
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
-        var pinView: MKPinAnnotationView
-        pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
-        pinView.animatesDrop = true
-        pinView.pinTintColor = UIColor.purple
-        pinView.canShowCallout = false
+        var pin: MKPinAnnotationView
+        pin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: nil)
+        pin.animatesDrop = true
+        pin.pinTintColor = UIColor.purple
+        pin.canShowCallout = false
         
-        return pinView
+        return pin
     }
 
     func setupMapView(view: MKAnnotationView) {
@@ -44,6 +64,7 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate {
         mapView.setRegion(region, animated: true)
     }
     
+
     @IBAction func doneBtnPressed(_ sender: Any) {
         if let navController = self.navigationController {
             navController.popViewController(animated: true)
