@@ -12,9 +12,7 @@ import Foundation
 class FlickrClient {
     
     
-    func getLocationId(lat: Double, lon: Double, completionHandler: @escaping (_ success: Bool, _ data: String, _ error: String) -> Void) {
-        
-        var success = false
+    func getLocationId(lat: Double, lon: Double, completionHandlerForGetLocationId: @escaping (_ data: AnyObject?, _ error: NSError?) -> Void) {
         
         let methodParameters = [
             FlickrConstants.FlickrParameterKeys.Method: FlickrConstants.FlickrParameterValues.LatLonMethod,
@@ -24,75 +22,66 @@ class FlickrClient {
             FlickrConstants.FlickrParameterKeys.Format: FlickrConstants.FlickrParameterValues.ResponseFormat,
             FlickrConstants.FlickrParameterKeys.NoJSONCallback: FlickrConstants.FlickrParameterValues.DisableJSONCallback
         ]
-
-        let urlString = FlickrConstants.Flickr.APIBaseUrl + escapedParameters(parameters: methodParameters)
-        let url = URL(string: urlString)!
-        let session = URLSession.shared
-        let request = URLRequest(url: url)
         
+        let urlString = FlickrConstants.Flickr.APIBaseUrl + escapedParameters(parameters: methodParameters)
+        
+        getDataTask(urlString: urlString) { (data, error) in
+            
+            guard (error == nil) else {
+                completionHandlerForGetLocationId(nil, NSError(domain: "Get Location ID", code: 100, userInfo: nil))
+                return
+            }
+            
+            guard let status = data?[FlickrConstants.FlickrResponseKeys.Status] as? String, status == FlickrConstants.FlickrResponseValues.StatusOK else {
+                completionHandlerForGetLocationId(nil, NSError(domain: "Get Location ID - status error", code: 200, userInfo: nil))
+                return
+            }
+            
+            /* GUARD: Is there a place in the result? */
+            guard let places = data?[FlickrConstants.FlickrResponseKeys.PlacesResponse] as? [String:AnyObject],
+                let place = places[FlickrConstants.FlickrResponseKeys.Place] as? [[String:AnyObject]] else {
+                    completionHandlerForGetLocationId(nil, NSError(domain: "Get Location ID - no place found", code: 300, userInfo: nil))
+                    return
+            }
+            
+            // Get place Id
+            guard let placeId = place[0][FlickrConstants.FlickrResponseKeys.PlaceId] as? String else {
+                completionHandlerForGetLocationId(nil, NSError(domain: "Get Location ID - no place Id found", code: 400, userInfo: nil))
+                return
+            }
+            //print(placeId)
+            completionHandlerForGetLocationId(placeId as AnyObject, nil)
+        }
+    }
+    
+    // MARK: Data Task
+    func getDataTask (urlString: String , completionHandlerForGetDataTask: @escaping (_ result: AnyObject? , _ error: NSError?) -> Void)
+    {
+        let url = URL(string: urlString)!
+        let request = URLRequest(url: url)
+        let session = URLSession.shared
+        
+        //Create Task
         let task = session.dataTask(with: request) { (data, response, error) in
             
-            // if an error occurs, print it and re-enable the UI
-            func displayError(error: String) {
-                print(error)
-                print("URL at time of error: \(url)")
-                completionHandler(false, "", "Error getting location ID")
-            }
-            
-            /* GUARD: Was there an error? */
             guard (error == nil) else {
-                displayError(error: "There was an error with your request: \(error)")
-                return
-            }
-            
-            /* GUARD: Did we get a successful 2XX response? */
-            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else {
-                displayError(error: "Your request returned a status code other than 2xx!")
-                return
-            }
-            
-            /* GUARD: Was there any data returned? */
-            guard let data = data else {
-                displayError(error: "No data was returned by the request!")
+                completionHandlerForGetDataTask(nil, error! as NSError)
                 return
             }
             
             // parse the data
             let parsedResult: [String: AnyObject]
             do {
-                parsedResult = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as! [String:AnyObject]
+                parsedResult = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [String:AnyObject]
             } catch {
-                displayError(error: "Could not parse the data as JSON: '\(data)'")
+                completionHandlerForGetDataTask(nil, NSError(domain: "GetDataTask JSON Serialization", code: 0, userInfo: nil))
                 return
             }
-            
-            /* GUARD: Did Flickr return an error (stat != ok)? */
-            guard let stat = parsedResult[FlickrConstants.FlickrResponseKeys.Status] as? String, stat == FlickrConstants.FlickrResponseValues.StatusOK else {
-                displayError(error: "Flickr API returned an error. See error code and message in \(parsedResult)")
-                return
-            }
-            
-            //print(parsedResult)
-            
-            /* GUARD: Is there a place in the result? */
-            guard let places = parsedResult[FlickrConstants.FlickrResponseKeys.PlacesResponse] as? [String:AnyObject],
-                let place = places[FlickrConstants.FlickrResponseKeys.Place] as? [[String:AnyObject]] else {
-                    displayError(error: "Cannot find place '\(FlickrConstants.FlickrResponseKeys.Place)' in \(parsedResult)")
-                    return
-            }
-            
-            // Get place Id
-            guard let placeId = place[0][FlickrConstants.FlickrResponseKeys.PlaceId] as? String else {
-                displayError(error: "Cannot get a \(FlickrConstants.FlickrResponseKeys.PlaceId) in \(parsedResult)")
-                return
-            }
-            //print(placeId)
-            completionHandler(true, placeId, "")
-
+            completionHandlerForGetDataTask(parsedResult as AnyObject?, nil)
         }
         task.resume()
-        
     }
+    
     
     private func escapedParameters(parameters: [String: Any]) -> String {
         

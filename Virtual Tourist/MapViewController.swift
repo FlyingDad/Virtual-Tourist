@@ -100,6 +100,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                     print("Cound not fetch \(error), \(error.userInfo)")
                     return
             }
+            photoViewController.managedContext = managedContext
             self.navigationController?.pushViewController(photoViewController, animated:true)
         }
 
@@ -153,13 +154,13 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             mapView.addAnnotation(newAnnotation)
             
             // Get Flickr location ID then save pin to core data
-            client.getLocationId(lat: newAnnotation.coordinate.latitude, lon: newAnnotation.coordinate.longitude, completionHandler: {(success, data, error) in
+            client.getLocationId(lat: newAnnotation.coordinate.latitude, lon: newAnnotation.coordinate.longitude, completionHandlerForGetLocationId: {(data, error) in
                 
-                if !success {
-                    print("Error getting Flickr locationID. Error: \(error)")
+                if error != nil {
+                    print(error!.localizedDescription)
                     return
                 }
-                self.savePin(coords: coords, locationId: data)
+                self.savePin(coords: coords, locationId: data as! String)
             })
         }
     }
