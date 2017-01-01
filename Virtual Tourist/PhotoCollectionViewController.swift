@@ -16,10 +16,12 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
     
-    let Client = FlickrClient()
+    let client = FlickrClient()
     var managedContext: NSManagedObjectContext!
     var pinView = MKAnnotationView()
     var pin: Pin!
+    var photosArray = [Photo!]()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +29,8 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
         setupMapView(view: pinView)
         collectionView.delegate = self
         collectionView.dataSource = self
-        print("Finally made it: \(pin.locationId)")
+        // print("Finally made it: \(pin.locationId)")
+        getPhotosForLocation(locationId: pin.locationId!)
     }
     
     // Layout the collection view - from Color Collection by Jason
@@ -77,6 +80,19 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
         let span = MKCoordinateSpan(latitudeDelta: 0.04225, longitudeDelta: 0.04225)
         let region = MKCoordinateRegion(center: (view.annotation?.coordinate)!, span: span)
         mapView.setRegion(region, animated: true)
+    }
+    
+    func getPhotosForLocation(locationId: String) {
+        //Returns data for photos at location (# of photos, array of photos, etc)
+        client.getPhotoDataForLocationId(locationId: pin.locationId!) { (data, error) in
+            print("get photo return")
+            guard (error == nil) else {
+                // Display alert?
+                return
+            }
+            
+            print(data?["total"])
+        }
     }
     
 

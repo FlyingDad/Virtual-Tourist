@@ -54,6 +54,43 @@ class FlickrClient {
         }
     }
     
+    func getPhotoDataForLocationId(locationId: String, completionHandlerForGetPhotoDataForLocationId: @escaping(_ result: AnyObject?, _ error: NSError?) -> Void) {
+        
+        let methodParameters = [
+            FlickrConstants.FlickrParameterKeys.Method: FlickrConstants.FlickrParameterValues.photoSearchMethod,
+            FlickrConstants.FlickrParameterKeys.APIKey: FlickrConstants.FlickrParameterValues.APIKey,
+            FlickrConstants.FlickrParameterKeys.PlaceId: locationId,
+            FlickrConstants.FlickrParameterKeys.PerPage: FlickrConstants.FlickrParameterValues.PerPage,
+            FlickrConstants.FlickrParameterKeys.Pages: FlickrConstants.FlickrParameterValues.Pages,
+            FlickrConstants.FlickrParameterKeys.Format: FlickrConstants.FlickrParameterValues.ResponseFormat,
+            FlickrConstants.FlickrParameterKeys.NoJSONCallback: FlickrConstants.FlickrParameterValues.DisableJSONCallback
+        ]
+        
+        let urlString = FlickrConstants.Flickr.APIBaseUrl + escapedParameters(parameters: methodParameters)
+        
+        getDataTask(urlString: urlString) { (data, error) in
+            
+            guard (error == nil) else {
+                completionHandlerForGetPhotoDataForLocationId(nil, NSError(domain: "Get Photo Data", code: 100, userInfo: nil))
+                return
+            }
+            
+            guard let status = data?[FlickrConstants.FlickrResponseKeys.Status] as? String, status == FlickrConstants.FlickrResponseValues.StatusOK else {
+                completionHandlerForGetPhotoDataForLocationId(nil, NSError(domain: "Get Photo Data - status error", code: 200, userInfo: nil))
+                return
+            }
+            
+            /* GUARD: Is there a place in the result? */
+            guard let photos = data?[FlickrConstants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+                completionHandlerForGetPhotoDataForLocationId(nil, NSError(domain: "Get Photo Data - no photos found", code: 300, userInfo: nil))
+                    return
+            }
+            
+            //print("--->>> Photos: \(photos)")
+            completionHandlerForGetPhotoDataForLocationId(photos as AnyObject, nil)
+        }
+    }
+    
     // MARK: Data Task
     func getDataTask (urlString: String , completionHandlerForGetDataTask: @escaping (_ result: AnyObject? , _ error: NSError?) -> Void)
     {

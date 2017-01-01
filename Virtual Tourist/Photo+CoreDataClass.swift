@@ -1,5 +1,5 @@
 //
-//  Pin+CoreDataClass.swift
+//  Photo+CoreDataClass.swift
 //  Virtual Tourist
 //
 //  Created by Michael Kroth on 1/1/17.
@@ -10,6 +10,6 @@ import Foundation
 import CoreData
 
 
-public class Pin: NSManagedObject {
+public class Photo: NSManagedObject {
 
 }

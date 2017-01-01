@@ -33,6 +33,8 @@ struct FlickrConstants {
         static let ResponseFormat = "json"
         static let DisableJSONCallback = "1"
         static let PhotoSize = "_n" /* n small, 320 on longest side */
+        static let PerPage = "20"
+        static let Pages = "1"
     }
     
     struct FlickrResponseKeys {
