@@ -10,8 +10,9 @@ struct FlickrConstants {
     
     struct Flickr {
         static let APIBaseUrl = "https://api.flickr.com/services/rest/"
-        static let PhotoSourceUrlPart1 = "https://farm"  /* will insert farm id after this */
-        static let PhotoSourceUrlPart2 = ".static.flickr.com/"
+//        static let PhotoSourceUrlPart1 = "https://farm"  /* will insert farm id after this */
+//        static let PhotoSourceUrlPart2 = ".static.flickr.com/"
+//        static let PhotoSize = "url_m"
     }
     
     struct FlickrParameterKeys {
@@ -24,6 +25,7 @@ struct FlickrConstants {
         static let PlaceId = "place_id"
         static let Pages = "page"
         static let PerPage = "per_page"
+        static let Extras = "extras"
     }
     
     struct FlickrParameterValues {
@@ -35,6 +37,7 @@ struct FlickrConstants {
         static let PhotoSize = "_n" /* n small, 320 on longest side */
         static let PerPage = "20"
         static let Pages = "1"
+        static let ExtraMediumUrl = "url_m"
     }
     
     struct FlickrResponseKeys {

@@ -15,13 +15,22 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var toolBarButton: UIBarButtonItem!
     
+
     let client = FlickrClient()
     var managedContext: NSManagedObjectContext!
     var pinView = MKAnnotationView()
     var pin: Pin!
     var photosArray = [Photo!]()
+    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
+    //var editMode = true
     
+    var selectedCellIndexes = [IndexPath]()
+    
+    var insertedIndexPaths: [IndexPath]!
+    var deletedIndexPaths: [IndexPath]!
+    //var updatedIndexPaths: [IndexPath]!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,8 +38,10 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
         setupMapView(view: pinView)
         collectionView.delegate = self
         collectionView.dataSource = self
-        // print("Finally made it: \(pin.locationId)")
-        getPhotosForLocation(locationId: pin.locationId!)
+        toolBarButton.title = "New Collection"
+        if loadPhotos().isEmpty {
+            getPhotoUrlsForLocation(locationId: pin.locationId!)
+        }
     }
     
     // Layout the collection view - from Color Collection by Jason
@@ -48,17 +59,68 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
         collectionView.collectionViewLayout = layout
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+    func configureCell(_ cell: PhotoCollectionViewCell, atIndexPath indexPath: IndexPath) {
+        
+        print("Configuring cell")
+        if let _ = selectedCellIndexes.index(of: indexPath) {
+            cell.alpha = 1.0
+        } else {
+            cell.alpha = 0.5
+        }
     }
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        //return 21
+        return fetchedResultsController.sections![section].numberOfObjects
     }
+
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCollectionViewCell
+        cell.activityIndicator.startAnimating()
+        let photo = fetchedResultsController.object(at: indexPath) as! Photo
+        
+        client.downloadPhoto(urlString: photo.url!) { (imageData, error) in
+            guard (error == nil) else {
+                print("Error downloading photo for cell: \(error!.localizedDescription)")
+                return
+            }
+            guard let image = UIImage(data: imageData!) else {
+                return
+            }
+            
+            DispatchQueue.main.async {
+                photo.data = imageData as NSData?
+                do {
+                    try self.managedContext.save()
+                } catch let error as NSError {
+                    print("Could not save photo data. \(error), \(error.userInfo)")
+                }
+                cell.photo.image = image
+                cell.activityIndicator.stopAnimating()
+            }
+        }
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        print("Selected cell")
+        let cell = collectionView.cellForItem(at: indexPath) as! PhotoCollectionViewCell
+        self.configureCell(cell, atIndexPath: indexPath)
+        
+        if let cellIndex = selectedCellIndexes.index(of: indexPath) {
+            selectedCellIndexes.remove(at: cellIndex)
+        } else {
+            selectedCellIndexes.append(indexPath)
+        }
+        
+        if selectedCellIndexes.isEmpty {
+            toolBarButton.title = "New Collection"
+        } else {
+            toolBarButton.title = "Delete Selected Items"
+        }
     }
     
     
@@ -82,24 +144,141 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
         mapView.setRegion(region, animated: true)
     }
     
-    func getPhotosForLocation(locationId: String) {
-        //Returns data for photos at location (# of photos, array of photos, etc)
-        client.getPhotoDataForLocationId(locationId: pin.locationId!) { (data, error) in
+    func getPhotoUrlsForLocation(locationId: String) {
+        
+        client.getPhotoUrlsForLocationId(locationId: pin.locationId!) { (data, error) in
             print("get photo return")
             guard (error == nil) else {
                 // Display alert?
+                print("Error: \(error!.localizedDescription)")
+                return
+            }
+            guard let photoUrls = data! as? NSArray else {
                 return
             }
             
-            print(data?["total"])
+            // Save the urls to each photo object
+            DispatchQueue.main.async {
+                for eachUrl in photoUrls {
+                    let photo = Photo(context: self.managedContext)
+                    photo.pin = self.pin
+                    photo.url = eachUrl as? String
+                }
+            }
         }
     }
-    
 
     @IBAction func doneBtnPressed(_ sender: Any) {
+        
         if let navController = self.navigationController {
             navController.popViewController(animated: true)
         }
+    }
+    
+    @IBAction func deleteSelectedCells(_ sender: Any) {
+        
+        //If any cells are selected, delete them
+        if !selectedCellIndexes.isEmpty {
+            var photosToDelete = [Photo]()
+            
+            
+            for eachCellSelected in selectedCellIndexes {
+                photosToDelete.append(fetchedResultsController.object(at: eachCellSelected) as! Photo)
+            }
+            
+            DispatchQueue.main.async {
+                for photo in photosToDelete {
+                    self.managedContext.delete(photo)
+                }
+            }
+        }
+        selectedCellIndexes = [IndexPath]()
+    }
+    
+// End of Class
+}
+
+extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("In controller will change")
+        insertedIndexPaths = [IndexPath]()
+        deletedIndexPaths = [IndexPath]()
+        //updatedIndexPaths = [IndexPath]()
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        print("In controller did change object")
+        switch type {
+            
+        case .insert:
+            print("Insert an item")
+            // Here we are noting that a new Color instance has been added to Core Data. We remember its index path
+            // so that we can add a cell in "controllerDidChangeContent". Note that the "newIndexPath" parameter has
+            // the index path that we want in this case
+            insertedIndexPaths.append(newIndexPath!)
+            break
+        case .delete:
+            print("Delete an item")
+            // Here we are noting that a Color instance has been deleted from Core Data. We remember its index path
+            // so that we can remove the corresponding cell in "controllerDidChangeContent". The "indexPath" parameter has
+            // value that we want in this case.
+            deletedIndexPaths.append(indexPath!)
+            break
+//        case .update:
+//            print("Update an item.")
+//            // We don't expect Color instances to change after they are created. But Core Data would
+//            // notify us of changes if any occured. This can be useful if you want to respond to changes
+//            // that come about after data is downloaded. For example, when an image is downloaded from
+//            // Flickr in the Virtual Tourist app
+//            updatedIndexPaths.append(indexPath!)
+//            break
+        case .move:
+            print("Move an item. We don't expect to see this in this app.")
+            break
+        default:
+            break
+        }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("In controller did change")
+        collectionView.performBatchUpdates({ 
+            
+            for indexPath in self.insertedIndexPaths {
+                self.collectionView.insertItems(at: [indexPath])
+            }
+            
+            for indexPath in self.deletedIndexPaths {
+                self.collectionView.deleteItems(at: [indexPath])
+            }
+            
+//            for indexPath in self.updatedIndexPaths {
+//                self.collectionView.reloadItems(at: [indexPath])
+//            }
+        }, completion: nil)
+    }
+    
+    
+    func loadPhotos() -> [Photo] {
+        
+        var photos = [Photo]()
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+        fetchRequest.predicate = NSPredicate(format: "pin = %@", pin)
+        fetchRequest.sortDescriptors = []
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: managedContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+            if let results = fetchedResultsController.fetchedObjects as? [Photo] {
+                photos = results
+            }
+        } catch {
+            print("Error fetching photos from core data")
+        }
+        return photos
     }
     
 }

@@ -12,7 +12,7 @@ import Foundation
 class FlickrClient {
     
     
-    func getLocationId(lat: Double, lon: Double, completionHandlerForGetLocationId: @escaping (_ data: AnyObject?, _ error: NSError?) -> Void) {
+    func getLocationId(lat: Double, lon: Double, completionHandlerForGetLocationId: @escaping (_ result: AnyObject?, _ error: NSError?) -> Void) {
         
         let methodParameters = [
             FlickrConstants.FlickrParameterKeys.Method: FlickrConstants.FlickrParameterValues.LatLonMethod,
@@ -49,12 +49,11 @@ class FlickrClient {
                 completionHandlerForGetLocationId(nil, NSError(domain: "Get Location ID - no place Id found", code: 400, userInfo: nil))
                 return
             }
-            //print(placeId)
             completionHandlerForGetLocationId(placeId as AnyObject, nil)
         }
     }
     
-    func getPhotoDataForLocationId(locationId: String, completionHandlerForGetPhotoDataForLocationId: @escaping(_ result: AnyObject?, _ error: NSError?) -> Void) {
+    func getPhotoUrlsForLocationId(locationId: String, completionHandlerForGetPhotoDataForLocationId: @escaping(_ result: AnyObject?, _ error: NSError?) -> Void) {
         
         let methodParameters = [
             FlickrConstants.FlickrParameterKeys.Method: FlickrConstants.FlickrParameterValues.photoSearchMethod,
@@ -62,6 +61,7 @@ class FlickrClient {
             FlickrConstants.FlickrParameterKeys.PlaceId: locationId,
             FlickrConstants.FlickrParameterKeys.PerPage: FlickrConstants.FlickrParameterValues.PerPage,
             FlickrConstants.FlickrParameterKeys.Pages: FlickrConstants.FlickrParameterValues.Pages,
+            FlickrConstants.FlickrParameterKeys.Extras: FlickrConstants.FlickrParameterValues.ExtraMediumUrl,
             FlickrConstants.FlickrParameterKeys.Format: FlickrConstants.FlickrParameterValues.ResponseFormat,
             FlickrConstants.FlickrParameterKeys.NoJSONCallback: FlickrConstants.FlickrParameterValues.DisableJSONCallback
         ]
@@ -79,16 +79,36 @@ class FlickrClient {
                 completionHandlerForGetPhotoDataForLocationId(nil, NSError(domain: "Get Photo Data - status error", code: 200, userInfo: nil))
                 return
             }
-            
-            /* GUARD: Is there a place in the result? */
-            guard let photos = data?[FlickrConstants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+
+            /* GUARD: Are there photos in the result? */
+            guard let photosDict = data?[FlickrConstants.FlickrResponseKeys.Photos] as? [String: AnyObject], let photosArray = photosDict[FlickrConstants.FlickrResponseKeys.Photo] as? [[String:AnyObject]] else {
+                print("Not getting photosarray")
                 completionHandlerForGetPhotoDataForLocationId(nil, NSError(domain: "Get Photo Data - no photos found", code: 300, userInfo: nil))
                     return
             }
-            
-            //print("--->>> Photos: \(photos)")
-            completionHandlerForGetPhotoDataForLocationId(photos as AnyObject, nil)
+            // Extract urls for each phot and put into array
+            var photoUrls = [String]()
+            for eachPhoto in photosArray {
+                photoUrls.append((eachPhoto[FlickrConstants.FlickrParameterValues.ExtraMediumUrl] as? String)!)
+            }
+            completionHandlerForGetPhotoDataForLocationId(photoUrls as AnyObject, nil)
         }
+    }
+    
+    func downloadPhoto(urlString: String, completionHandlerForDownloadPhoto: @escaping(_ result: Data?, _ error: NSError?) -> Void) {
+        let url = URL(string: urlString)!
+        let request = URLRequest(url: url)
+        let session = URLSession.shared
+        let task = session.dataTask(with: request) { (data, response, error) in
+            
+            guard (error == nil) else {
+                completionHandlerForDownloadPhoto(nil, error! as NSError)
+                return
+            }
+            completionHandlerForDownloadPhoto(data, nil)
+        }
+        task.resume()
+
     }
     
     // MARK: Data Task
@@ -97,7 +117,6 @@ class FlickrClient {
         let url = URL(string: urlString)!
         let request = URLRequest(url: url)
         let session = URLSession.shared
-        
         //Create Task
         let task = session.dataTask(with: request) { (data, response, error) in
             

@@ -6,7 +6,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -91,8 +90,7 @@
                                 </constraints>
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="B1P-vn-C2g">
-                                <rect key="frame" x="0.0" y="160" width="375" height="507"/>
-                                <color key="backgroundColor" red="0.40000000600000002" green="0.80000001190000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <rect key="frame" x="0.0" y="160" width="375" height="463"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="sv7-6n-CHz">
                                     <size key="itemSize" width="0.0" height="0.0"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -107,9 +105,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="121" height="121"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="W34-ug-I6I">
-                                                    <rect key="frame" x="8" y="8" width="105" height="105"/>
-                                                    <color key="backgroundColor" red="0.25098040700000002" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="W34-ug-I6I">
+                                                    <rect key="frame" x="0.0" y="0.0" width="121" height="121"/>
                                                 </imageView>
                                                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="HBh-Oy-wKP">
                                                     <rect key="frame" x="50.5" y="50.5" width="20" height="20"/>
@@ -118,12 +115,12 @@
                                         </view>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
-                                            <constraint firstItem="W34-ug-I6I" firstAttribute="bottom" secondItem="rAD-kQ-GhR" secondAttribute="bottomMargin" id="3V4-FM-nZ9"/>
+                                            <constraint firstAttribute="trailing" secondItem="W34-ug-I6I" secondAttribute="trailing" id="GF3-C8-gAf"/>
+                                            <constraint firstItem="W34-ug-I6I" firstAttribute="top" secondItem="rAD-kQ-GhR" secondAttribute="top" id="P2r-S2-PAA"/>
                                             <constraint firstItem="HBh-Oy-wKP" firstAttribute="centerY" secondItem="rAD-kQ-GhR" secondAttribute="centerY" id="SiG-Ev-2eC"/>
-                                            <constraint firstItem="W34-ug-I6I" firstAttribute="top" secondItem="rAD-kQ-GhR" secondAttribute="topMargin" id="Tye-7p-Q8Z"/>
-                                            <constraint firstItem="W34-ug-I6I" firstAttribute="leading" secondItem="rAD-kQ-GhR" secondAttribute="leadingMargin" id="axg-2a-hBV"/>
+                                            <constraint firstAttribute="bottom" secondItem="W34-ug-I6I" secondAttribute="bottom" id="Wn5-us-145"/>
                                             <constraint firstItem="HBh-Oy-wKP" firstAttribute="centerX" secondItem="rAD-kQ-GhR" secondAttribute="centerX" id="cbx-yB-LKS"/>
-                                            <constraint firstItem="W34-ug-I6I" firstAttribute="trailing" secondItem="rAD-kQ-GhR" secondAttribute="trailingMargin" id="sOH-lk-Xfz"/>
+                                            <constraint firstItem="W34-ug-I6I" firstAttribute="leading" secondItem="rAD-kQ-GhR" secondAttribute="leading" id="iuN-zr-ipt"/>
                                         </constraints>
                                         <size key="customSize" width="121" height="121"/>
                                         <connections>
@@ -133,16 +130,34 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inF-wZ-NRK">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="myl-gh-xXR"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="0MV-Mn-QK4"/>
+                                    <barButtonItem title="Item" id="C1h-s5-RVN">
+                                        <connections>
+                                            <action selector="deleteSelectedCells:" destination="Cy3-mH-tkT" id="Gdo-eS-oga"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="Q9l-9G-X5S"/>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="7Py-xV-yq5" firstAttribute="top" secondItem="B1P-vn-C2g" secondAttribute="bottom" id="3qR-7o-3Q8"/>
                             <constraint firstAttribute="trailing" secondItem="B1P-vn-C2g" secondAttribute="trailing" id="4gf-Ah-Jnh"/>
+                            <constraint firstItem="inF-wZ-NRK" firstAttribute="top" secondItem="B1P-vn-C2g" secondAttribute="bottom" id="7TO-H0-4TA"/>
                             <constraint firstItem="B1P-vn-C2g" firstAttribute="top" secondItem="G1N-Ir-sfT" secondAttribute="bottom" id="FtR-MA-r8s"/>
                             <constraint firstAttribute="trailing" secondItem="G1N-Ir-sfT" secondAttribute="trailing" id="T8l-pF-PZl"/>
+                            <constraint firstItem="7Py-xV-yq5" firstAttribute="top" secondItem="inF-wZ-NRK" secondAttribute="bottom" id="Z8t-k4-CGR"/>
                             <constraint firstItem="B1P-vn-C2g" firstAttribute="leading" secondItem="SK9-gp-tai" secondAttribute="leading" id="ccA-ok-Lyk"/>
                             <constraint firstItem="G1N-Ir-sfT" firstAttribute="leading" secondItem="SK9-gp-tai" secondAttribute="leading" id="mUR-0X-eGT"/>
                             <constraint firstItem="G1N-Ir-sfT" firstAttribute="top" secondItem="WWL-Kd-a4G" secondAttribute="bottom" id="vfc-Uj-GkG"/>
+                            <constraint firstAttribute="trailing" secondItem="inF-wZ-NRK" secondAttribute="trailing" id="xgm-d3-1mW"/>
+                            <constraint firstItem="inF-wZ-NRK" firstAttribute="leading" secondItem="SK9-gp-tai" secondAttribute="leading" id="xiL-vv-cNG"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Title" id="TQl-Ih-AAw">
@@ -155,6 +170,7 @@
                     <connections>
                         <outlet property="collectionView" destination="B1P-vn-C2g" id="UNf-Ls-Hy0"/>
                         <outlet property="mapView" destination="G1N-Ir-sfT" id="E7S-Rw-kG4"/>
+                        <outlet property="toolBarButton" destination="C1h-s5-RVN" id="4Me-o2-19M"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Oj9-Y6-q87" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -1,4 +1,3 @@
-
 //
 //  MapViewController.swift
 //  Virtual Tourist
@@ -24,11 +23,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     let client = FlickrClient()
     
     var managedContext: NSManagedObjectContext!
-    
     var editingMap = false
     var editButtonAction = UIBarButtonItem()
-    
-    //var userAnnotations: [NSManagedObject] = []
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +33,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         editButtonAction = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editBtnPressed))
         navigationItem.rightBarButtonItem = editButtonAction
     }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -49,6 +47,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             print("Cound not fetch \(error), \(error.userInfo)")
         }
     }
+    
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
     
@@ -68,6 +67,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
         return pinView
     }
+    
       
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
@@ -106,6 +106,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
 
     }
     
+    
     func deletePin(pin: MKAnnotationView) {
         
         guard let lat = pin.annotation?.coordinate.latitude, let lon = pin.annotation?.coordinate.longitude else {
@@ -142,12 +143,13 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
+    
     @IBAction func addPin(_ sender: UILongPressGestureRecognizer) {
         
         // Only create one pin on longpress
         if sender.state == .began {
             let touchLocation = sender.location(in: mapView)
-            // convert touchpont to CLLocationCoordinate2D for annotation use
+            // Convert touchpont to CLLocationCoordinate2D for annotation use
             let coords = mapView.convert(touchLocation, toCoordinateFrom: mapView)
             let newAnnotation = MKPointAnnotation()
             newAnnotation.coordinate = coords
@@ -165,9 +167,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
+    
     // Add saved pins to map
     func loadSavedPins(pins: [Pin]) {
-        //print(pins)
+
         for pin in pins {
             let annotation = MKPointAnnotation()
             annotation.coordinate.latitude = pin.latitude
@@ -175,6 +178,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             mapView.addAnnotation(annotation)
         }
     }
+    
    
     // Save pin to core data
     func savePin(coords: CLLocationCoordinate2D, locationId: String) {
