@@ -29,7 +29,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("Mapview did load")
         mapView.delegate = self
         editButtonAction = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editBtnPressed))
         navigationItem.rightBarButtonItem = editButtonAction
@@ -38,7 +37,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("Mapview will appear")
         mapView.removeAnnotations(mapView.annotations)
         // Load saved pins
         let pinFetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
@@ -125,12 +123,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         do {
             let results = try managedContext.fetch(pinFetchRequest)
-            print(results.count)
-            print("Searching for \(lat)")
             // delete only the first result (in case there was more than one match)
             
             if results.count > 0 {
-                print("found matching pin")
+                
                 DispatchQueue.main.async {
                     self.managedContext.delete(results.first!)
                     do {

@@ -64,7 +64,7 @@ class FlickrClient {
             FlickrConstants.FlickrParameterKeys.Extras: FlickrConstants.FlickrParameterValues.ExtraMediumUrl,
             FlickrConstants.FlickrParameterKeys.Format: FlickrConstants.FlickrParameterValues.ResponseFormat,
             FlickrConstants.FlickrParameterKeys.NoJSONCallback: FlickrConstants.FlickrParameterValues.DisableJSONCallback,
-            "radius": "16"
+            FlickrConstants.FlickrParameterKeys.Radius: FlickrConstants.FlickrParameterValues.RadiusKm
         ]
         
         let urlString = FlickrConstants.Flickr.APIBaseUrl + escapedParameters(parameters: methodParameters)

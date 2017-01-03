@@ -26,6 +26,7 @@ struct FlickrConstants {
         static let Pages = "page"
         static let PerPage = "per_page"
         static let Extras = "extras"
+        static let Radius = "radius"
     }
     
     struct FlickrParameterValues {
@@ -38,6 +39,7 @@ struct FlickrConstants {
         static let PerPage = "21"
         static let Pages = 20 // We will generate a random page # from this number
         static let ExtraMediumUrl = "url_m"
+        static let RadiusKm = "25" // search rasius in kilometers
     }
     
     struct FlickrResponseKeys {

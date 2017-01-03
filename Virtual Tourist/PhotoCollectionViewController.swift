@@ -59,7 +59,6 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
     
     func configureCell(_ cell: PhotoCollectionViewCell, atIndexPath indexPath: IndexPath) {
         
-        print("Configuring cell")
         if let _ = selectedCellIndexes.index(of: indexPath) {
             cell.alpha = 1.0
         } else {
@@ -104,7 +103,6 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        print("Selected cell")
         let cell = collectionView.cellForItem(at: indexPath) as! PhotoCollectionViewCell
         self.configureCell(cell, atIndexPath: indexPath)
         
@@ -145,7 +143,6 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
     func getPhotoUrlsForLocation(locationId: String) {
         
         client.getPhotoUrlsForLocationId(locationId: pin.locationId!) { (data, error) in
-            print("get photo return")
             guard (error == nil) else {
                 // Display alert?
                 print("Error: \(error!.localizedDescription)")
@@ -228,40 +225,19 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
 extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("In controller will change")
+
         insertedIndexPaths = [IndexPath]()
         deletedIndexPaths = [IndexPath]()
-        //updatedIndexPaths = [IndexPath]()
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        print("In controller did change object")
+
         switch type {
-            
         case .insert:
-            print("Insert an item")
-            // Here we are noting that a new Color instance has been added to Core Data. We remember its index path
-            // so that we can add a cell in "controllerDidChangeContent". Note that the "newIndexPath" parameter has
-            // the index path that we want in this case
             insertedIndexPaths.append(newIndexPath!)
             break
         case .delete:
-            print("Delete an item")
-            // Here we are noting that a Color instance has been deleted from Core Data. We remember its index path
-            // so that we can remove the corresponding cell in "controllerDidChangeContent". The "indexPath" parameter has
-            // value that we want in this case.
             deletedIndexPaths.append(indexPath!)
-            break
-//        case .update:
-//            print("Update an item.")
-//            // We don't expect Color instances to change after they are created. But Core Data would
-//            // notify us of changes if any occured. This can be useful if you want to respond to changes
-//            // that come about after data is downloaded. For example, when an image is downloaded from
-//            // Flickr in the Virtual Tourist app
-//            updatedIndexPaths.append(indexPath!)
-//            break
-        case .move:
-            print("Move an item. We don't expect to see this in this app.")
             break
         default:
             break
@@ -269,7 +245,7 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("In controller did change")
+        
         collectionView.performBatchUpdates({ 
             
             for indexPath in self.insertedIndexPaths {
