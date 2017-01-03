@@ -91,6 +91,7 @@
                             </mapView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="B1P-vn-C2g">
                                 <rect key="frame" x="0.0" y="160" width="375" height="463"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="sv7-6n-CHz">
                                     <size key="itemSize" width="0.0" height="0.0"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -107,13 +108,14 @@
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="W34-ug-I6I">
                                                     <rect key="frame" x="0.0" y="0.0" width="121" height="121"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 </imageView>
                                                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="HBh-Oy-wKP">
                                                     <rect key="frame" x="50.5" y="50.5" width="20" height="20"/>
                                                 </activityIndicatorView>
                                             </subviews>
                                         </view>
-                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="W34-ug-I6I" secondAttribute="trailing" id="GF3-C8-gAf"/>
                                             <constraint firstItem="W34-ug-I6I" firstAttribute="top" secondItem="rAD-kQ-GhR" secondAttribute="top" id="P2r-S2-PAA"/>

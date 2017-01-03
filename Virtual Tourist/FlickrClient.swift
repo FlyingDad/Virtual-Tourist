@@ -60,10 +60,11 @@ class FlickrClient {
             FlickrConstants.FlickrParameterKeys.APIKey: FlickrConstants.FlickrParameterValues.APIKey,
             FlickrConstants.FlickrParameterKeys.PlaceId: locationId,
             FlickrConstants.FlickrParameterKeys.PerPage: FlickrConstants.FlickrParameterValues.PerPage,
-            FlickrConstants.FlickrParameterKeys.Pages: FlickrConstants.FlickrParameterValues.Pages,
+            FlickrConstants.FlickrParameterKeys.Pages: self.randomPageGenerator(),
             FlickrConstants.FlickrParameterKeys.Extras: FlickrConstants.FlickrParameterValues.ExtraMediumUrl,
             FlickrConstants.FlickrParameterKeys.Format: FlickrConstants.FlickrParameterValues.ResponseFormat,
-            FlickrConstants.FlickrParameterKeys.NoJSONCallback: FlickrConstants.FlickrParameterValues.DisableJSONCallback
+            FlickrConstants.FlickrParameterKeys.NoJSONCallback: FlickrConstants.FlickrParameterValues.DisableJSONCallback,
+            "radius": "16"
         ]
         
         let urlString = FlickrConstants.Flickr.APIBaseUrl + escapedParameters(parameters: methodParameters)
@@ -158,4 +159,21 @@ class FlickrClient {
             return "?\(keyValuePairs.joined(separator: "&"))"
         }
     }
+    
+    func randomPageGenerator() -> String {
+        let randomPage = arc4random_uniform(UInt32(FlickrConstants.FlickrParameterValues.Pages))
+        return String(randomPage)
+    }
+    
+    private func makeBBox(lat latitude: Double,  long longitude: Double) -> String {
+        
+        let minimumLon = max(longitude - FlickrConstants.BBox.Width, FlickrConstants.BBox.LonRange.0)
+        let maximumLon = min(longitude + FlickrConstants.BBox.Width, FlickrConstants.BBox.LonRange.1)
+        
+        let minimumLat = max(latitude - FlickrConstants.BBox.Height, FlickrConstants.BBox.LatRange.0)
+        let maximumLat = min(latitude + FlickrConstants.BBox.Height, FlickrConstants.BBox.LatRange.1)
+
+        return "\(minimumLon),\(minimumLat),\(maximumLon),\(maximumLat)"
+    }
+    
 }

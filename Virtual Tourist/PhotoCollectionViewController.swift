@@ -17,14 +17,12 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var toolBarButton: UIBarButtonItem!
     
-
     let client = FlickrClient()
     var managedContext: NSManagedObjectContext!
     var pinView = MKAnnotationView()
     var pin: Pin!
     var photosArray = [Photo!]()
     var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
-    //var editMode = true
     
     var selectedCellIndexes = [IndexPath]()
     
@@ -157,13 +155,22 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
                 return
             }
             
+            if photoUrls.count == 0 {
+                self.alertNoPhotos()
+            }
             // Save the urls to each photo object
             DispatchQueue.main.async {
-                for eachUrl in photoUrls {
-                    let photo = Photo(context: self.managedContext)
-                    photo.pin = self.pin
-                    photo.url = eachUrl as? String
-                }
+                
+                do {
+                    for eachUrl in photoUrls {
+                        let photo = Photo(context: self.managedContext)
+                        photo.pin = self.pin
+                        photo.url = eachUrl as? String
+                    }
+                    try self.managedContext.save()
+                    }catch let error as NSError {
+                        print("Fetch error: \(error) description: \(error.userInfo)")
+                    }
             }
         }
     }
@@ -187,11 +194,31 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
             }
             
             DispatchQueue.main.async {
-                for photo in photosToDelete {
-                    self.managedContext.delete(photo)
+                do {
+                    for photo in photosToDelete {
+                        self.managedContext.delete(photo)
+                    }
+                    try self.managedContext.save()
+                }catch let error as NSError {
+                    print("Fetch error: \(error) description: \(error.userInfo)")
                 }
             }
+        } else { // delete all photos for New Collection
+            
+            DispatchQueue.main.async {
+                do {
+                    let allPhotos =  self.fetchedResultsController.fetchedObjects as! [Photo]
+                    for eachPhoto in allPhotos {
+                        self.managedContext.delete(eachPhoto)
+                    }
+                    try self.managedContext.save()
+                } catch let error as NSError {
+                    print("Fetch error: \(error) description: \(error.userInfo)")
+                }
+                self.getPhotoUrlsForLocation(locationId: self.pin.locationId!)
+            }
         }
+        toolBarButton.title = "New Collection"
         selectedCellIndexes = [IndexPath]()
     }
     
@@ -279,6 +306,15 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
             print("Error fetching photos from core data")
         }
         return photos
+    }
+    
+    func alertNoPhotos(){
+        let alert = UIAlertController(title: "Notice", message: "No photos were found near this location.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Close", style: UIAlertActionStyle.default, handler: nil))
+        DispatchQueue.main.async {
+            self.present(alert, animated: true, completion: nil)
+        }
+        
     }
     
 }

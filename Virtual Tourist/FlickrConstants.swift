@@ -34,9 +34,9 @@ struct FlickrConstants {
         static let APIKey = "87407f2f6b8dfc26750ccc05ee5de163"
         static let ResponseFormat = "json"
         static let DisableJSONCallback = "1"
-        static let PhotoSize = "_n" /* n small, 320 on longest side */
-        static let PerPage = "20"
-        static let Pages = "1"
+        //static let PhotoSize = "_n" /* n small, 320 on longest side */
+        static let PerPage = "21"
+        static let Pages = 20 // We will generate a random page # from this number
         static let ExtraMediumUrl = "url_m"
     }
     
@@ -51,6 +51,14 @@ struct FlickrConstants {
     
     struct FlickrResponseValues {
         static let StatusOK = "ok"
+    }
+    
+    struct BBox
+    {
+        static let Width = 1.0
+        static let Height = 1.0
+        static let LatRange = (-90.0, 90.0)
+        static let LonRange = (-180.0, 180.0)
     }
     
 }

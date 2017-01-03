@@ -29,6 +29,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("Mapview did load")
         mapView.delegate = self
         editButtonAction = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editBtnPressed))
         navigationItem.rightBarButtonItem = editButtonAction
@@ -37,7 +38,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        print("Mapview will appear")
+        mapView.removeAnnotations(mapView.annotations)
         // Load saved pins
         let pinFetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
         do {
@@ -120,6 +122,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         let pinFetchRequest = NSFetchRequest<Pin>(entityName: "Pin")
         pinFetchRequest.predicate = NSPredicate(format: "(%K BETWEEN {\(lat - precision), \(lat + precision) }) AND (%K BETWEEN {\(lon - precision), \(lon + precision) })", #keyPath(Pin.latitude), #keyPath(Pin.longitude))
         
+        
         do {
             let results = try managedContext.fetch(pinFetchRequest)
             print(results.count)
@@ -127,13 +130,16 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             // delete only the first result (in case there was more than one match)
             
             if results.count > 0 {
-                managedContext.delete(results.first!)
-                do {
-                    try managedContext.save()
-                    // Also delete pin from mapview
-                    mapView.removeAnnotation(pin.annotation!)
-                } catch let error as NSError {
-                    print("Saving error: \(error), description: \(error.userInfo)")
+                print("found matching pin")
+                DispatchQueue.main.async {
+                    self.managedContext.delete(results.first!)
+                    do {
+                        try self.managedContext.save()
+                        // Also delete pin from mapview
+                        self.mapView.removeAnnotation(pin.annotation!)
+                    } catch let error as NSError {
+                        print("Saving error: \(error), description: \(error.userInfo)")
+                    }
                 }
             }
             
