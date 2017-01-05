@@ -37,7 +37,7 @@ struct FlickrConstants {
         static let DisableJSONCallback = "1"
         //static let PhotoSize = "_n" /* n small, 320 on longest side */
         static let PerPage = "21"
-        static let Pages = 20 // We will generate a random page # from this number
+        static let Pages = 190 // We will generate a random page # from this number
         static let ExtraMediumUrl = "url_m"
         static let RadiusKm = "25" // search rasius in kilometers
     }

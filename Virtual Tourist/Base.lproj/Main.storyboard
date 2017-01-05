@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Map View Controller-->
+        <!--Virtual Tourist-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="MapViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -54,7 +54,7 @@
                             <outletCollection property="gestureRecognizers" destination="OfX-b7-nKA" appends="YES" id="gXX-Sk-EBg"/>
                         </connections>
                     </view>
-                    <navigationItem key="navigationItem" id="YLJ-qp-hNn"/>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="YLJ-qp-hNn"/>
                     <connections>
                         <outlet property="bottomToolbar" destination="b91-6i-iX6" id="5xJ-HB-du2"/>
                         <outlet property="bottomToolbarBottomConstraint" destination="hKz-Zf-HoW" id="oIl-tT-SXQ"/>
@@ -71,7 +71,7 @@
             </objects>
             <point key="canvasLocation" x="1252" y="139"/>
         </scene>
-        <!--Title-->
+        <!--Photo Collection View Controller-->
         <scene sceneID="QRP-Li-G1q">
             <objects>
                 <viewController storyboardIdentifier="PhotoCollectionViewController" id="Cy3-mH-tkT" customClass="PhotoCollectionViewController" customModule="Virtual_Tourist" customModuleProvider="target" sceneMemberID="viewController">
@@ -162,7 +162,7 @@
                             <constraint firstItem="inF-wZ-NRK" firstAttribute="leading" secondItem="SK9-gp-tai" secondAttribute="leading" id="xiL-vv-cNG"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Title" id="TQl-Ih-AAw">
+                    <navigationItem key="navigationItem" id="TQl-Ih-AAw">
                         <barButtonItem key="leftBarButtonItem" systemItem="done" id="o8p-w9-k8b">
                             <connections>
                                 <action selector="doneBtnPressed:" destination="Cy3-mH-tkT" id="30A-p8-myf"/>

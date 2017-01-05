@@ -75,27 +75,39 @@ class PhotoCollectionViewController: UIViewController, MKMapViewDelegate, UIColl
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotoCollectionViewCell
-        cell.activityIndicator.startAnimating()
+        DispatchQueue.main.async {
+            cell.activityIndicator.startAnimating()
+            cell.photo.image = nil
+        }
         let photo = fetchedResultsController.object(at: indexPath) as! Photo
         
-        client.downloadPhoto(urlString: photo.url!) { (imageData, error) in
-            guard (error == nil) else {
-                print("Error downloading photo for cell: \(error!.localizedDescription)")
-                return
-            }
-            guard let image = UIImage(data: imageData!) else {
-                return
-            }
-            
+        
+        if let photo = photo.data {
+            let image = UIImage(data: photo as Data)
             DispatchQueue.main.async {
-                photo.data = imageData as NSData?
-                do {
-                    try self.managedContext.save()
-                } catch let error as NSError {
-                    print("Could not save photo data. \(error), \(error.userInfo)")
-                }
                 cell.photo.image = image
                 cell.activityIndicator.stopAnimating()
+            }
+        } else {
+            client.downloadPhoto(urlString: photo.url!) { (imageData, error) in
+                guard (error == nil) else {
+                    print("Error downloading photo for cell: \(error!.localizedDescription)")
+                    return
+                }
+                guard let image = UIImage(data: imageData!) else {
+                    return
+                }
+            
+                DispatchQueue.main.async {
+                    photo.data = imageData as NSData?
+                    do {
+                        try self.managedContext.save()
+                    } catch let error as NSError {
+                        print("Could not save photo data. \(error), \(error.userInfo)")
+                    }
+                    cell.photo.image = image
+                    cell.activityIndicator.stopAnimating()
+                }
             }
         }
         return cell
@@ -255,10 +267,7 @@ extension PhotoCollectionViewController: NSFetchedResultsControllerDelegate {
             for indexPath in self.deletedIndexPaths {
                 self.collectionView.deleteItems(at: [indexPath])
             }
-            
-//            for indexPath in self.updatedIndexPaths {
-//                self.collectionView.reloadItems(at: [indexPath])
-//            }
+
         }, completion: nil)
     }
     

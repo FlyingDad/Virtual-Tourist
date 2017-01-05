@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapViewController: UIViewController, MKMapViewDelegate {
+final class MapViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var bottomToolbar: UIToolbar!
@@ -30,6 +30,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
+        
+        loadUsersLastMapRegion()
         editButtonAction = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editBtnPressed))
         navigationItem.rightBarButtonItem = editButtonAction
     }
@@ -104,6 +106,20 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             self.navigationController?.pushViewController(photoViewController, animated:true)
         }
 
+    }
+    
+    // Save map position
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        //Save map region in UserDefaults
+        let mapRegion = [
+            "latitude" : mapView.region.center.latitude,
+            "longitude" : mapView.region.center.longitude,
+            "latitudeDelta" : mapView.region.span.latitudeDelta,
+            "longitudeDelta" : mapView.region.span.longitudeDelta
+        ]
+
+        UserDefaults.standard.set(mapRegion, forKey: "savedMapRegion")
+        UserDefaults.standard.synchronize()
     }
     
     
@@ -219,6 +235,23 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             UIView.animate(withDuration: 0.4 , animations: {
                 self.view.layoutIfNeeded()
             })
+        }
+    }
+    
+    func loadUsersLastMapRegion() {
+        if let mapRegion = UserDefaults.standard.dictionary(forKey: "savedMapRegion") {
+            
+            let longitude = mapRegion["longitude"] as! CLLocationDegrees
+            let latitude = mapRegion["latitude"] as! CLLocationDegrees
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            
+            let longitudeDelta = mapRegion["latitudeDelta"] as! CLLocationDegrees
+            let latitudeDelta = mapRegion["longitudeDelta"] as! CLLocationDegrees
+            let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+            
+            let savedRegion = MKCoordinateRegion(center: center, span: span)
+            
+            self.mapView.setRegion(savedRegion, animated: true)
         }
     }
 }
